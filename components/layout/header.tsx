@@ -100,7 +100,7 @@ export function Header() {
       {/* Mobile drawer */}
       <div
         className={cn(
-          'md:hidden fixed inset-x-0 top-16 bottom-0 bg-neutral-50 transition-all duration-300 ease-in-out',
+          'md:hidden fixed inset-x-0 top-16 bottom-0 bg-neutral-50/95 backdrop-blur-xl shadow-2xl transition-all duration-300 ease-in-out',
           mobileOpen
             ? 'opacity-100 visible translate-y-0'
             : 'opacity-0 invisible -translate-y-2'

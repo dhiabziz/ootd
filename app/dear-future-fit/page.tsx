@@ -16,7 +16,8 @@ export default function DearFutureFitPage() {
         title="Dear Future Fit"
         subtitle="Surat untuk dirimu di masa depan"
         description="Apa yang ingin kamu sampaikan pada dirimu yang akan datang? Tulis impian, harapan, dan janjimu hari ini. Suratmu akan menjadi pengingat tentang siapa kamu hari ini."
-        image="/images/dear-future-fit-hero.svg"
+        image="/images/dear-future-fit-hero.png"
+        theme="dark"
       />
 
       {/* Form */}

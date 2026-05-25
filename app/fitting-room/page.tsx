@@ -23,30 +23,30 @@ export default function FittingRoomPage() {
         title="Fitting Room"
         subtitle="Ruang aman untuk bercerita"
         description="Ada hal yang ingin kamu sampaikan tapi sulit dibicarakan? Di sini kamu didengar tanpa dihakimi. Konsultasi dilakukan via WhatsApp untuk kenyamananmu."
-        image="/images/fitting-room-hero.svg"
-      />
+        image="/images/fitting-room-hero.png"
+        blur="blur-md"
+      >
+        <div className="bg-primary-50/90 border border-primary-100 rounded-2xl p-6 backdrop-blur-sm shadow-xl shadow-slate-200/50">
+          <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {features.map((feature) => (
+              <li
+                key={feature.text}
+                className="flex items-center gap-3 text-sm font-medium text-neutral-900"
+              >
+                <span className="flex-shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full bg-white border border-primary-100">
+                  <feature.icon className="h-4 w-4 text-primary-600" />
+                </span>
+                <span>{feature.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </PageHero>
 
-      {/* Info + Form */}
+      {/* Form */}
       <section className="pb-20 md:pb-32">
         <div className="container mx-auto">
           <div className="max-w-2xl mx-auto space-y-8">
-            {/* Info card */}
-            <div className="bg-primary-50 border border-primary-100 rounded-2xl p-6">
-              <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {features.map((feature) => (
-                  <li
-                    key={feature.text}
-                    className="flex items-center gap-3 text-sm font-medium text-neutral-900"
-                  >
-                    <span className="flex-shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-full bg-white border border-primary-100">
-                      <feature.icon className="h-4 w-4 text-primary-600" />
-                    </span>
-                    <span>{feature.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
             <FittingRoomForm />
           </div>
         </div>
