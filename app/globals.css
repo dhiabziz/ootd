@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 36 50% 97%;
+    --foreground: 0 0% 18%;
+  }
+
+  * {
+    @apply border-neutral-200;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 font-sans antialiased;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      font-size: 18px;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+    line-height: 1.15;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .container-narrow {
+    @apply max-w-3xl mx-auto px-4 sm:px-6;
+  }
+}
