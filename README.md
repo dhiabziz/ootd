@@ -166,37 +166,42 @@ await supabase.from('letters').insert({
 
 Tabel `letters` dan `fitting_room_requests` perlu dibuat manual di Supabase dashboard.
 
-### 2. Pengiriman email → **Brevo**
+### 2. Pengiriman email → **Gmail SMTP via Nodemailer**
 ```bash
-pnpm add @getbrevo/brevo
+pnpm add nodemailer
 ```
 ```ts
-import * as Brevo from '@getbrevo/brevo';
-const apiInstance = new Brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
+import { createTransport } from 'nodemailer';
 
-await apiInstance.sendTransacEmail({
-  sender: {
-    name: process.env.BREVO_SENDER_NAME!,
-    email: process.env.BREVO_SENDER_EMAIL!,
+const transporter = createTransport({
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.GMAIL_USER!,
+    pass: process.env.GMAIL_APP_PASSWORD!,
   },
-  to: [{ email: 'nabilajasmine6426@gmail.com', name: 'OOTD Admin' }],
+});
+
+await transporter.sendMail({
+  from: `"${process.env.MAIL_SENDER_NAME!}" <${process.env.GMAIL_USER!}>`,
+  to: 'nabilajasmine6426@gmail.com',
   subject: '📩 [OOTD] Surat baru dari Dear Future Fit',
-  htmlContent: `<p>Nama: ${validated.name}</p>...`,
+  html: `<p>Nama: ${validated.name}</p>...`,
 });
 ```
 
 ### 3. Penjadwalan pengiriman surat → **Cron eksternal**
-Buat endpoint `/api/cron/send-due-letters` yang query Supabase untuk `scheduled_delivery <= now()` dan kirim via Brevo.
+Buat endpoint `/api/cron/send-due-letters` yang query Supabase untuk `scheduled_delivery <= now()` dan kirim via Gmail SMTP.
 > Untuk setup manual, gunakan layanan cron eksternal seperti cron-job.org dan panggil endpoint tersebut sekali sehari.
 
 ### 4. Env vars yang dibutuhkan
 ```env
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
-BREVO_API_KEY=...
-BREVO_SENDER_EMAIL=...
-BREVO_SENDER_NAME=OOTD
+GMAIL_USER=ootdproject123@gmail.com
+GMAIL_APP_PASSWORD=...
+MAIL_SENDER_NAME=OOTD Project
 ADMIN_EMAIL=...
 CRON_SECRET=...
 ```
@@ -207,16 +212,16 @@ CRON_SECRET=...
 
 Fitur `Dear Future Fit` sekarang sudah wired ke backend nyata:
 - data surat disimpan di tabel Supabase `letters`
-- notifikasi admin dikirim lewat Brevo
+- notifikasi admin dikirim lewat Gmail SMTP via Nodemailer
 - pengiriman surat terjadwal diproses melalui cron endpoint `/api/cron/send-due-letters`
 
 ### Env vars di Vercel dashboard
 Tambahkan semua variabel ini ke project Vercel kamu:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `BREVO_API_KEY`
-- `BREVO_SENDER_EMAIL`
-- `BREVO_SENDER_NAME`
+- `GMAIL_USER`
+- `GMAIL_APP_PASSWORD`
+- `MAIL_SENDER_NAME`
 - `ADMIN_EMAIL`
 - `CRON_SECRET`
 
@@ -226,10 +231,10 @@ Jalankan cek manual dengan curl:
 curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain.vercel.app/api/cron/send-due-letters
 ```
 
-### Catatan Brevo
-- Sender harus verified di dashboard Brevo sebelum email bisa terkirim.
-- Free tier Brevo biasanya dibatasi ~300 email/hari.
-- Di free tier, footer "Sent with Brevo" akan muncul di email. Untuk menghilangkan footer perlu upgrade ke plan berbayar.
+### Catatan Email
+- Gmail SMTP menggunakan App Password atau akun yang sudah diizinkan untuk login SMTP.
+- Limit Gmail biasa sekitar 500 email/hari; kalau mau scale ke atas itu, migrasi ke provider email dedicated.
+- Pastikan `GMAIL_USER` sudah valid dan `GMAIL_APP_PASSWORD` sudah aktif di akun Google kamu.
 - Cron job sebaiknya diatur manual lewat layanan eksternal seperti cron-job.org.
 
 ---

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { z, ZodError } from 'zod';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { sendAdminNotification } from '@/lib/brevo';
+import { sendAdminNotification } from '@/lib/mailer';
 
 const LetterSchema = z.object({
   name: z.string().min(2),
@@ -66,11 +66,11 @@ export async function POST(request: Request) {
 
     try {
       await sendAdminNotification({
-        name: validated.name,
-        email: validated.email,
-        age: validated.age,
+        recipientName: validated.name,
+        recipientEmail: validated.email,
+        recipientAge: validated.age,
         deliveryOption: validated.delivery_option,
-        scheduledDelivery,
+        scheduledAt: scheduledDelivery,
       });
     } catch (notificationError) {
       console.error('[Letters API] Admin notification failed', notificationError);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdmin } from '@/lib/supabase';
-import { sendLetterEmail } from '@/lib/brevo';
+import { sendLetterEmail } from '@/lib/mailer';
 
 type PendingLetter = {
   id: string;
@@ -50,10 +50,10 @@ export async function GET(request: Request) {
     letters.map(async (letter) => {
       try {
         await sendLetterEmail({
-          to: letter.email,
-          name: letter.name,
+          recipientEmail: letter.email,
+          recipientName: letter.name,
           letterContent: letter.letter_content,
-          originalDate: letter.created_at,
+          scheduledAt: letter.scheduled_delivery,
         });
 
         const { error: updateError } = await supabaseAdmin
@@ -69,9 +69,12 @@ export async function GET(request: Request) {
       } catch (sendError) {
         console.error(`[Cron] failed to send letter ${letter.id}`, sendError);
 
+        const errorMessage =
+          sendError instanceof Error ? sendError.message : String(sendError);
+
         await supabaseAdmin
           .from('letters')
-          .update({ status: 'failed' })
+          .update({ status: 'failed', error_message: errorMessage })
           .eq('id', letter.id);
 
         return 'failed' as const;
