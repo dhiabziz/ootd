@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     if (error instanceof ZodError) {
-      console.error('[Letters API] Validation failed', error.errors);
+      console.error('[Letters API] Validation failed', error.issues);
       return NextResponse.json(
         { success: false, error: 'Invalid payload' },
         { status: 400 }

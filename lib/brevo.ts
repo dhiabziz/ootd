@@ -1,4 +1,4 @@
-import * as Brevo from '@getbrevo/brevo';
+import { BrevoClient } from '@getbrevo/brevo';
 
 function getBrevoApiKey(): string {
   const value = process.env.BREVO_API_KEY;
@@ -32,11 +32,9 @@ function getAdminEmail(): string {
   return value;
 }
 
-const apiInstance = new Brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(
-  Brevo.TransactionalEmailsApiApiKeys.apiKey,
-  getBrevoApiKey()
-);
+const apiInstance = new BrevoClient({
+  apiKey: getBrevoApiKey(),
+});
 
 const primaryColor = '#B85C72';
 const backgroundColor = '#FBF8F4';
@@ -146,7 +144,7 @@ export async function sendLetterEmail(options: {
   letterContent: string;
   originalDate: string;
 }): Promise<void> {
-  await apiInstance.sendTransacEmail({
+  await apiInstance.transactionalEmails.sendTransacEmail({
     sender: {
       name: getBrevoSenderName(),
       email: getBrevoSenderEmail(),
@@ -164,7 +162,7 @@ export async function sendAdminNotification(options: {
   deliveryOption: string;
   scheduledDelivery: string;
 }): Promise<void> {
-  await apiInstance.sendTransacEmail({
+  await apiInstance.transactionalEmails.sendTransacEmail({
     sender: {
       name: getBrevoSenderName(),
       email: getBrevoSenderEmail(),
