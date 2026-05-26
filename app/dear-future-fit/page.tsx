@@ -21,7 +21,7 @@ export default function DearFutureFitPage() {
       />
 
       {/* Form */}
-      <section className="pb-20 md:pb-32">
+      <section className="mt-12 pb-20 md:mt-16 md:pb-32">
         <div className="container mx-auto">
           <div className="max-w-2xl mx-auto">
             <LetterForm />

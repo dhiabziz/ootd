@@ -51,11 +51,15 @@ export function Header() {
       <div className="container mx-auto">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-baseline gap-2 group" aria-label="OOTD beranda">
+          <Link
+            href="/"
+            className="flex flex-col sm:flex-row items-start sm:items-baseline gap-1 sm:gap-2 group"
+            aria-label="OOTD beranda"
+          >
             <span className="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900 group-hover:text-primary-700 transition-colors">
               OOTD
             </span>
-            <span className="hidden sm:inline text-[10px] md:text-xs uppercase tracking-[0.18em] font-medium text-neutral-500">
+            <span className="text-[10px] md:text-xs uppercase tracking-[0.18em] font-medium text-primary-600">
               Our Own Tomorrow Dreams
             </span>
           </Link>

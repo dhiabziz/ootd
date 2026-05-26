@@ -27,7 +27,7 @@ export function PageHero({
 }: PageHeroProps) {
   const isDark = theme === 'dark';
   const imageTint = isDark ? 'bg-neutral-950/20' : 'bg-black/5';
-  const heroOverlay = isDark ? 'bg-black/40' : 'bg-black/40';
+  const heroOverlay = isDark ? 'bg-black/40' : 'bg-black/60';
 
   return (
     <section className="relative py-20 md:py-28 overflow-hidden">

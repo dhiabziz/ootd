@@ -24,7 +24,7 @@ export default function FittingRoomPage() {
         subtitle="Ruang aman untuk bercerita"
         description="Ada hal yang ingin kamu sampaikan tapi sulit dibicarakan? Di sini kamu didengar tanpa dihakimi. Konsultasi dilakukan via WhatsApp untuk kenyamananmu."
         image="/images/fitting-room-hero.png"
-        blur="blur-md"
+        blur="blur-[8px]"
       >
         <div className="bg-primary-50/90 border border-primary-100 rounded-2xl p-6 backdrop-blur-sm shadow-xl shadow-slate-200/50">
           <ul className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -44,7 +44,7 @@ export default function FittingRoomPage() {
       </PageHero>
 
       {/* Form */}
-      <section className="pb-20 md:pb-32">
+      <section className="mt-12 pb-20 md:mt-16 md:pb-32">
         <div className="container mx-auto">
           <div className="max-w-2xl mx-auto space-y-8">
             <FittingRoomForm />

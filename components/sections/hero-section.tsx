@@ -109,14 +109,6 @@ export function HeroSection() {
             >
               Mulai perjalananmu →
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full text-base h-14"
-              onClick={() => scrollTo('yakin-siap')}
-            >
-              Lihat semua topik ↗
-            </Button>
           </motion.div>
         </div>
       </div>
