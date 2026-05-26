@@ -166,38 +166,71 @@ await supabase.from('letters').insert({
 
 Tabel `letters` dan `fitting_room_requests` perlu dibuat manual di Supabase dashboard.
 
-### 2. Pengiriman email → **Resend**
+### 2. Pengiriman email → **Brevo**
 ```bash
-pnpm add resend
+pnpm add @getbrevo/brevo
 ```
 ```ts
-import { Resend } from 'resend';
-const resend = new Resend(process.env.RESEND_API_KEY!);
+import * as Brevo from '@getbrevo/brevo';
+const apiInstance = new Brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY!);
 
-// Notif ke admin
-await resend.emails.send({
-  from: 'OOTD <noreply@your-domain.id>',
-  to: 'nabilajasmine6426@gmail.com',
-  subject: 'Surat baru dari Dear Future Fit',
-  html: `<p>Nama: ${validated.name}</p>...`,
+await apiInstance.sendTransacEmail({
+  sender: {
+    name: process.env.BREVO_SENDER_NAME!,
+    email: process.env.BREVO_SENDER_EMAIL!,
+  },
+  to: [{ email: 'nabilajasmine6426@gmail.com', name: 'OOTD Admin' }],
+  subject: '📩 [OOTD] Surat baru dari Dear Future Fit',
+  htmlContent: `<p>Nama: ${validated.name}</p>...`,
 });
 ```
 
-### 3. Penjadwalan pengiriman surat → **Vercel Cron Jobs** atau **QStash**
-Buat endpoint `/api/cron/send-due-letters` yang query Supabase untuk `scheduled_delivery <= now()` dan kirim via Resend. Daftarkan di `vercel.json`:
-```json
-{
-  "crons": [{ "path": "/api/cron/send-due-letters", "schedule": "*/15 * * * *" }]
-}
-```
+### 3. Penjadwalan pengiriman surat → **Cron eksternal**
+Buat endpoint `/api/cron/send-due-letters` yang query Supabase untuk `scheduled_delivery <= now()` dan kirim via Brevo.
+> Untuk setup manual, gunakan layanan cron eksternal seperti cron-job.org dan panggil endpoint tersebut sekali sehari.
 
 ### 4. Env vars yang dibutuhkan
 ```env
 SUPABASE_URL=...
 SUPABASE_SERVICE_ROLE_KEY=...
-RESEND_API_KEY=...
-CRON_SECRET=...           # untuk autentikasi cron endpoint
+BREVO_API_KEY=...
+BREVO_SENDER_EMAIL=...
+BREVO_SENDER_NAME=OOTD
+ADMIN_EMAIL=...
+CRON_SECRET=...
 ```
+
+---
+
+## Backend Wiring (Production Mode)
+
+Fitur `Dear Future Fit` sekarang sudah wired ke backend nyata:
+- data surat disimpan di tabel Supabase `letters`
+- notifikasi admin dikirim lewat Brevo
+- pengiriman surat terjadwal diproses melalui cron endpoint `/api/cron/send-due-letters`
+
+### Env vars di Vercel dashboard
+Tambahkan semua variabel ini ke project Vercel kamu:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `BREVO_API_KEY`
+- `BREVO_SENDER_EMAIL`
+- `BREVO_SENDER_NAME`
+- `ADMIN_EMAIL`
+- `CRON_SECRET`
+
+### Test cron endpoint manual
+Jalankan cek manual dengan curl:
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" https://your-domain.vercel.app/api/cron/send-due-letters
+```
+
+### Catatan Brevo
+- Sender harus verified di dashboard Brevo sebelum email bisa terkirim.
+- Free tier Brevo biasanya dibatasi ~300 email/hari.
+- Di free tier, footer "Sent with Brevo" akan muncul di email. Untuk menghilangkan footer perlu upgrade ke plan berbayar.
+- Cron job sebaiknya diatur manual lewat layanan eksternal seperti cron-job.org.
 
 ---
 

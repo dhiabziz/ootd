@@ -1,17 +1,25 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
+import { getSupabaseAdmin } from '@/lib/supabase';
+import { sendAdminNotification } from '@/lib/brevo';
 
 const LetterSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   age: z.number().min(10).max(25),
-  delivery_option: z.enum(['test_2min', '1_year', '3_years', '5_years']),
+  delivery_option: z.enum(['test_1min', 'test_2min', '1_year', '3_years', '5_years']),
   letter_content: z.string().min(50),
 });
 
-function calculateDeliveryDate(option: string): string {
+type LetterPayload = z.infer<typeof LetterSchema>;
+
+function calculateDeliveryDate(option: LetterPayload['delivery_option']): string {
   const now = new Date();
+
   switch (option) {
+    case 'test_1min':
+      now.setMinutes(now.getMinutes() + 1);
+      break;
     case 'test_2min':
       now.setMinutes(now.getMinutes() + 2);
       break;
@@ -25,6 +33,7 @@ function calculateDeliveryDate(option: string): string {
       now.setFullYear(now.getFullYear() + 5);
       break;
   }
+
   return now.toISOString();
 }
 
@@ -32,28 +41,58 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const validated = LetterSchema.parse(body);
+    const scheduledDelivery = calculateDeliveryDate(validated.delivery_option);
 
-    // MOCK: log payload (replace with Supabase insert + Resend email in production)
-    console.log('[MOCK] New letter submission:', {
-      ...validated,
-      submitted_at: new Date().toISOString(),
-      scheduled_delivery: calculateDeliveryDate(validated.delivery_option),
-    });
+    const supabaseAdmin = getSupabaseAdmin();
+    const { error: insertError } = await supabaseAdmin.from('letters').insert([
+      {
+        name: validated.name,
+        email: validated.email,
+        age: validated.age,
+        delivery_option: validated.delivery_option,
+        letter_content: validated.letter_content,
+        scheduled_delivery: scheduledDelivery,
+        status: 'pending',
+      },
+    ]);
 
-    // MOCK: simulate admin notification email
-    console.log(
-      '[MOCK] Admin notification would be sent to: nabilajasmine6426@gmail.com'
-    );
+    if (insertError) {
+      console.error('[Letters API] Supabase insert failed', insertError);
+      return NextResponse.json(
+        { success: false, error: 'Unable to save letter at this time' },
+        { status: 500 }
+      );
+    }
+
+    try {
+      await sendAdminNotification({
+        name: validated.name,
+        email: validated.email,
+        age: validated.age,
+        deliveryOption: validated.delivery_option,
+        scheduledDelivery,
+      });
+    } catch (notificationError) {
+      console.error('[Letters API] Admin notification failed', notificationError);
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Letter saved successfully',
-      delivery_date: calculateDeliveryDate(validated.delivery_option),
+      delivery_date: scheduledDelivery,
     });
   } catch (error) {
+    if (error instanceof ZodError) {
+      console.error('[Letters API] Validation failed', error.errors);
+      return NextResponse.json(
+        { success: false, error: 'Invalid payload' },
+        { status: 400 }
+      );
+    }
+
+    console.error('[Letters API] Unexpected error', error);
     return NextResponse.json(
-      { success: false, error: 'Invalid payload' },
-      { status: 400 }
+      { success: false, error: 'Server error, please try again later' },
+      { status: 500 }
     );
   }
 }

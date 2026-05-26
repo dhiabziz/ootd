@@ -34,13 +34,14 @@ const LetterSchema = z.object({
     .number()
     .min(10, 'Usia minimal 10 tahun')
     .max(25, 'Usia maksimal 25 tahun'),
-  delivery_option: z.enum(['test_2min', '1_year', '3_years', '5_years']),
+  delivery_option: z.enum(['test_1min', 'test_2min', '1_year', '3_years', '5_years']),
   letter_content: z.string().min(50, 'Isi surat minimal 50 karakter'),
 });
 
 type LetterFormValues = z.infer<typeof LetterSchema>;
 
 const deliveryLabels: Record<LetterFormValues['delivery_option'], string> = {
+  test_1min: '1 menit lagi (mode testing)',
   test_2min: '2 menit lagi (mode testing)',
   '1_year': '1 tahun lagi',
   '3_years': '3 tahun lagi',
@@ -168,6 +169,9 @@ export function LetterForm() {
                   <SelectValue placeholder="Pilih waktu pengiriman" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="test_1min">
+                    🧪 1 menit lagi (mode testing)
+                  </SelectItem>
                   <SelectItem value="test_2min">
                     🧪 2 menit lagi (mode testing)
                   </SelectItem>
