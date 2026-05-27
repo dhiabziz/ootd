@@ -18,7 +18,7 @@ Platform digital edukasi pernikahan dini untuk remaja Indonesia (usia 12–18 ta
 - **Start From Yourself** — Dua CTA ke fitur interaktif.
 
 ### Halaman `/dear-future-fit`
-Time capsule simbolis. Form lengkap (nama, email, usia, jadwal pengiriman 2 menit / 1 / 3 / 5 tahun, isi surat 50+ karakter) dengan validasi Zod, success dialog animatif, dan mock API.
+Time capsule simbolis. Form lengkap (nama, email, usia, jadwal pengiriman 2 menit / 1 / 3 / 5 tahun, isi surat 50+ karakter) dengan validasi Zod, success dialog animatif, dan backend nyata untuk simpan surat dan kirim notifikasi via Gmail SMTP.
 
 ### Halaman `/fitting-room`
 Konsultasi anonim. Form (umur, jenis kelamin, telepon, pendidikan, topik opsional) → success dialog → buka WhatsApp dengan pesan terformat ke `+62 896-1660-2357`.
@@ -107,7 +107,7 @@ vercel
 1. Push repo ke GitHub/GitLab/Bitbucket.
 2. Buka [vercel.com/new](https://vercel.com/new).
 3. Import repo → Framework auto-detect sebagai "Next.js" → klik **Deploy**.
-4. Selesai. Tidak ada env variable yang wajib untuk versi mock.
+4. Selesai. Untuk fitur `Dear Future Fit` dan pengiriman email terjadwal, tambahkan env vars berikut di Vercel atau lingkungan produksi.
 
 ---
 
@@ -116,7 +116,7 @@ vercel
 ```
 app/
 ├── api/
-│   ├── letters/route.ts          # POST mock surat masa depan
+│   ├── letters/route.ts          # POST surat masa depan (Supabase + Gmail SMTP)
 │   └── fitting-room/route.ts     # POST mock konsultasi
 ├── dear-future-fit/page.tsx      # Halaman form surat
 ├── fitting-room/page.tsx         # Halaman form konsultasi
@@ -144,7 +144,9 @@ tailwind.config.ts                # Custom tokens (primary/neutral palette)
 
 ## 🔌 Roadmap: Plug Real Backend
 
-API routes saat ini berupa **mock** — payload divalidasi via Zod lalu `console.log`-ed. Untuk produksi nyata:
+Fitur `Dear Future Fit` sudah wired ke backend nyata: payload divalidasi via Zod, disimpan di Supabase, dan notifikasi admin dikirim via Gmail SMTP. Route `/api/fitting-room` masih berupa mock konsultasi.
+
+Untuk produksi nyata:
 
 ### 1. Persistensi data → **Supabase**
 ```bash
