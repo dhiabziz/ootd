@@ -48,6 +48,23 @@ const deliveryLabels: Record<LetterFormValues['delivery_option'], string> = {
   '5_years': '5 tahun lagi',
 };
 
+function getSuccessDialogMessage(option: LetterFormValues['delivery_option']) {
+  switch (option) {
+    case 'test_1min':
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu dalam beberapa saat.';
+    case 'test_2min':
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu dalam beberapa menit.';
+    case '1_year':
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu sekitar setahun lagi. Sampai jumpa di masa depan! 🌱';
+    case '3_years':
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu sekitar 3 tahun lagi. Sampai jumpa di masa depan! 🌱';
+    case '5_years':
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu sekitar 5 tahun lagi. Sampai jumpa di masa depan! 🌱';
+    default:
+      return 'Suratmu udah aman tersimpan ✨ Akan dikirim ke email kamu sesuai jadwal yang kamu pilih.';
+  }
+}
+
 export function LetterForm() {
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
@@ -91,7 +108,7 @@ export function LetterForm() {
         email: data.email,
         delivery_option: data.delivery_option,
       });
-      toast.success('📧 Notifikasi telah dikirim ke admin (mock)');
+      toast.success('📧 Notifikasi telah dikirim ke admin');
       reset();
     } catch (err) {
       toast.error('Terjadi kesalahan. Silakan coba lagi.');
@@ -246,16 +263,11 @@ export function LetterForm() {
             <DialogDescription className="text-center pt-2">
               {success && (
                 <>
-                  Terima kasih,{' '}
-                  <strong className="text-neutral-900">{success.name}</strong>.
-                  Suratmu menjadi pengingat untuk dirimu di masa depan. Jadwal
-                  pengiriman:{' '}
-                  <strong className="text-neutral-900">
-                    {deliveryLabels[success.delivery_option]}
-                  </strong>{' '}
-                  ke{' '}
-                  <strong className="text-neutral-900">{success.email}</strong>
-                  .
+                  {getSuccessDialogMessage(success.delivery_option)}
+                  <br />
+                  <span className="text-neutral-900 font-semibold">
+                    {success.email}
+                  </span>
                 </>
               )}
             </DialogDescription>

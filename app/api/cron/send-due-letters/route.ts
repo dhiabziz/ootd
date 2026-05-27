@@ -53,7 +53,13 @@ export async function GET(request: Request) {
           recipientEmail: letter.email,
           recipientName: letter.name,
           letterContent: letter.letter_content,
-          scheduledAt: letter.scheduled_delivery,
+          createdAt: letter.created_at,
+          deliveryOption: letter.delivery_option as
+            | 'test_1min'
+            | 'test_2min'
+            | '1_year'
+            | '3_years'
+            | '5_years',
         });
 
         const { error: updateError } = await supabaseAdmin

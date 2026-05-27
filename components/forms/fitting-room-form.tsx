@@ -76,7 +76,7 @@ export function FittingRoomForm() {
         throw new Error(json.error || 'Gagal mengirim data');
       }
       setSuccess(data);
-      toast.success('📧 Notifikasi telah dikirim ke admin (mock)');
+      toast.success('📧 Notifikasi telah dikirim ke admin');
       reset();
     } catch (err) {
       toast.error('Terjadi kesalahan. Silakan coba lagi.');

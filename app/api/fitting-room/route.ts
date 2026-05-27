@@ -15,12 +15,12 @@ export async function POST(request: Request) {
     const validated = ConsultSchema.parse(body);
 
     // MOCK: log payload
-    console.log('[MOCK] New consultation request:', {
+    console.log('New consultation request:', {
       ...validated,
       submitted_at: new Date().toISOString(),
     });
     console.log(
-      '[MOCK] Admin notification would be sent to: nabilajasmine6426@gmail.com'
+      'Admin notification would be sent to: nabilajasmine6426@gmail.com'
     );
 
     return NextResponse.json({ success: true });

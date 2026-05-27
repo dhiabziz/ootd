@@ -34,25 +34,77 @@ type SendLetterEmailParams = {
   recipientEmail: string;
   recipientName: string;
   letterContent: string;
-  scheduledAt: string; // ISO string, untuk display di email
+  createdAt: string;
+  deliveryOption: 'test_1min' | 'test_2min' | '1_year' | '3_years' | '5_years';
 };
+
+function formatCreatedAt(createdAt: string): string {
+  const parsed = new Date(createdAt);
+  if (Number.isNaN(parsed.getTime())) {
+    return createdAt;
+  }
+  return parsed.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
+
+function getTimeFraming(
+  deliveryOption: SendLetterEmailParams['deliveryOption'],
+  createdAt: string
+) {
+  const formattedDate = formatCreatedAt(createdAt);
+
+  switch (deliveryOption) {
+    case 'test_1min':
+      return {
+        subject: 'Surat dari kamu, semenit yang lalu 💌',
+        intro: 'Kira-kira semenit lalu, kamu nulis surat ini buat dirimu sendiri.',
+      };
+    case 'test_2min':
+      return {
+        subject: 'Surat dari kamu, 2 menit lalu 💌',
+        intro: '2 menit lalu kamu nulis surat ini buat dirimu sendiri. Sekarang waktunya dibaca.',
+      };
+    case '1_year':
+      return {
+        subject: 'Surat dari setahun lalu 💌',
+        intro: `Setahun lalu — tepatnya <strong>${formattedDate}</strong> — kamu nulis surat ini buat diri kamu yang sekarang.`,
+      };
+    case '3_years':
+      return {
+        subject: 'Surat dari 3 tahun lalu 💌',
+        intro: `3 tahun lalu — di tanggal <strong>${formattedDate}</strong> — kamu nulis surat ini.`,
+      };
+    case '5_years':
+      return {
+        subject: 'Surat dari 5 tahun lalu 💌',
+        intro: `5 tahun lalu — di tanggal <strong>${formattedDate}</strong> — kamu nulis surat ini.`,
+      };
+    default:
+      return {
+        subject: 'Surat dari masa lalu kamu 💌',
+        intro: `Dulu, di tanggal <strong>${formattedDate}</strong>, kamu nulis surat ini buat diri kamu yang sekarang.`,
+      };
+  }
+}
 
 export async function sendLetterEmail({
   recipientEmail,
   recipientName,
   letterContent,
-  scheduledAt,
+  createdAt,
+  deliveryOption,
 }: SendLetterEmailParams) {
-  const subject = `Surat dari masa lalu untuk ${recipientName} 💌`;
+  const { subject, intro } = getTimeFraming(deliveryOption, createdAt);
 
   const html = `
     <div style="font-family: Arial, sans-serif; background-color: #FBF8F4; padding: 32px 16px; max-width: 600px; margin: 0 auto;">
       <div style="background-color: #ffffff; border-radius: 12px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-        <h1 style="color: #B85C72; font-size: 24px; margin: 0 0 16px 0;">Halo ${recipientName} 👋</h1>
+        <h1 style="color: #B85C72; font-size: 24px; margin: 0 0 16px 0;">Halo ${escapeHtml(recipientName)} 👋</h1>
         <p style="color: #555; font-size: 14px; margin: 0 0 24px 0;">
-          Ini surat yang lo tulis untuk diri lo sendiri pada
-          <strong>${new Date(scheduledAt).toLocaleDateString('id-ID', { dateStyle: 'long' })}</strong>.
-          Selamat membaca:
+          ${intro}
         </p>
         <div style="background-color: #FBF8F4; border-left: 4px solid #B85C72; padding: 20px; border-radius: 4px; color: #333; font-size: 16px; line-height: 1.7; white-space: pre-wrap;">${escapeHtml(letterContent)}</div>
         <p style="color: #888; font-size: 12px; margin: 32px 0 0 0; text-align: center;">
