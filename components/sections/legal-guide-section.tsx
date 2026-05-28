@@ -174,7 +174,7 @@ export function LegalGuideSection() {
                       <motion.div
                         initial={{ width: 0 }}
                         whileInView={{ width: `${widthPct}%` }}
-                        viewport={{ once: true, margin: '-80px' }}
+                        viewport={{ once: true, margin: '0px' }}
                         transition={{
                           duration: 0.9,
                           delay: idx * 0.08,
